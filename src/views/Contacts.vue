@@ -32,7 +32,6 @@
         @change="filteredListContact"
       >
         <option value disabled selected>Please select a role</option>
-
         <option
           v-for="contact in contacts"
           :key="contact.id"
@@ -70,6 +69,7 @@
     />
   </div>
 </template>
+
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -99,22 +99,16 @@ function editContact (contactId: number) {
   router.push({ name: 'upsertContact', params: { contactId } })
 }
 
-// function sortedArray () {
-//   contacts.value.filter((contact) =>
-//     contact.name.includes(selectedSort.value)
-//   ).sort((a, b) => {
+function sortedContacts () {
+  if (selectedSort.value === 'ascending'){
+    return contacts.value.sort((a, b) => a.name.localeCompare(b.name))
+  }
 
-//     if(selectedSort.value === 'ascending') {
-//       return a < b
-//     }
-//   }
-
-//   // if (selectedSort.value === 'ascending') {
-//   //   return names.sort((a, b) => a < b)
-//   // } else if (selectedSort.value === 'descending') {
-//   //   return names.sort((a, b) => a > b)
-//   // } else names
-// }
+  else if (selectedSort.value === 'descending') {
+    return contacts.value.sort((a, b) => b.name.localeCompare(a.name))
+  }
+  return contacts.value   
+}
 
 function filteredListContact () {
   if (inputSearchQuery.value) {
@@ -122,10 +116,14 @@ function filteredListContact () {
       contact.name.toLowerCase().includes(inputSearchQuery.value.toLowerCase()) ||
       contact.description.toLowerCase().includes(inputSearchQuery.value.toLowerCase())
     )
-  } else if (selected.value) {
+  } 
+  else if (selected.value) {
     return contacts.value.filter((contact) =>
       contact.role.includes(selected.value)
     )
+  } 
+  else if (selectedSort.value) {
+    sortedContacts()
   }
   return contacts.value
 }
